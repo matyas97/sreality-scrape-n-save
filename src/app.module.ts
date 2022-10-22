@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import AppConfig from './app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ScraperModule } from './scraper/scraper.module';
 
 @Module({
   imports: [
@@ -10,6 +11,8 @@ import { AppService } from './app.service';
       load: [AppConfig],
       isGlobal: true,
     }),
+    ScraperModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
