@@ -1,41 +1,67 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import puppeteer from 'puppeteer';
+
+interface ScrapedProperty {
+  title: string;
+  url: string;
+  thumbnailUrl: string;
+}
 
 @Injectable()
 export class ScraperService implements OnModuleInit {
+  constructor(private readonly configService: ConfigService) {}
+
   async onModuleInit() {
     Logger.log('Starting with scrape...', ScraperService.name);
 
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
     const page = await browser.newPage();
 
-    await page.goto('https://developers.google.com/web/');
+    const startingUrl = this.configService.get<string>('SREALITY_URL');
+    const pagesToScrape = this.configService.get<number>(
+      'SREALITY_PAGES_TO_SCRAPE',
+    );
 
-    // Type into search box.
-    await page.type('.devsite-search-field', 'Headless Chrome');
+    const scrapedProperties: ScrapedProperty[] = [];
 
-    // Wait for suggest overlay to appear and click "show all results".
-    const allResultsSelector = '.devsite-suggest-all-results';
-    await page.waitForSelector(allResultsSelector);
-    await page.click(allResultsSelector);
+    for (let index = 0; index < pagesToScrape; index++) {
+      const pageUrl = `${startingUrl}?strana=${index + 1}`;
+      Logger.log(`Scraping page ${pageUrl}...`, ScraperService.name);
 
-    // Wait for the results page to load and display the results.
-    const resultsSelector = '.gsc-results .gs-title';
-    await page.waitForSelector(resultsSelector);
+      await page.goto(pageUrl);
 
-    // Extract the results from the page.
-    const links = await page.evaluate((resultsSelector) => {
-      return [...document.querySelectorAll(resultsSelector)].map((anchor) => {
-        const title = anchor.textContent.split('|')[0].trim();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return `${title} - ${anchor.href}`;
+      await page.waitForSelector('.property');
+
+      const pageProperties: ScrapedProperty[] = await page.evaluate(() => {
+        const results: ScrapedProperty[] = [];
+
+        const list = document.querySelectorAll('.property');
+
+        list.forEach((property) => {
+          const scrapedProperty: ScrapedProperty = {
+            title: property.querySelector('.info > div > span > .locality')
+              .innerHTML,
+            url: property
+              .querySelector('preact > div > div > a')
+              .getAttribute('href'),
+            thumbnailUrl: property
+              .querySelector('preact > div > div > a > img')
+              .getAttribute('src'),
+          };
+
+          results.push(scrapedProperty);
+        });
+
+        return results;
       });
-    }, resultsSelector);
 
-    // Print all the files.
-    console.log(links.join('\n'));
+      scrapedProperties.push(...pageProperties);
+    }
 
+    Logger.log('Scrape finished...', ScraperService.name);
     await browser.close();
   }
 }
