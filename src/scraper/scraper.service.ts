@@ -1,18 +1,17 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import puppeteer from 'puppeteer';
-
-interface ScrapedProperty {
-  title: string;
-  url: string;
-  thumbnailUrl: string;
-}
+import { PropertyService } from 'src/property/property.service';
+import { ScrapedProperty } from './interface/scraped-property';
 
 @Injectable()
-export class ScraperService implements OnModuleInit {
-  constructor(private readonly configService: ConfigService) {}
+export class ScraperService implements OnApplicationBootstrap {
+  constructor(private readonly propertyService: PropertyService) {}
 
-  async onModuleInit() {
+  async onApplicationBootstrap() {
+    await this.scrapeSreality();
+  }
+
+  private async scrapeSreality() {
     Logger.log('Starting with scrape...', ScraperService.name);
 
     const browser = await puppeteer.launch({
@@ -21,10 +20,9 @@ export class ScraperService implements OnModuleInit {
 
     const page = await browser.newPage();
 
-    const startingUrl = this.configService.get<string>('SREALITY_URL');
-    const pagesToScrape = this.configService.get<number>(
-      'SREALITY_PAGES_TO_SCRAPE',
-    );
+    const startingUrl = 'https://www.sreality.cz/hledani/prodej/byty';
+
+    const pagesToScrape = 1;
 
     const scrapedProperties: ScrapedProperty[] = [];
 
@@ -61,6 +59,8 @@ export class ScraperService implements OnModuleInit {
 
       scrapedProperties.push(...pageProperties);
     }
+
+    await this.propertyService.createManyProperties(scrapedProperties);
 
     Logger.log('Scrape finished...', ScraperService.name);
     await browser.close();
