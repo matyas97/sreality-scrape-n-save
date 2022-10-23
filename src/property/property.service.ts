@@ -23,4 +23,13 @@ export class PropertyService {
       throw new ServiceUnavailableException();
     }
   }
+
+  listProperties() {
+    try {
+      return this.propertyRepository.find();
+    } catch (error) {
+      Logger.log(error, PropertyService.name);
+      throw new ServiceUnavailableException();
+    }
+  }
 }
