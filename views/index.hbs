@@ -15,6 +15,7 @@
 
 <body style="padding: 5rem 2rem 5rem 2rem;">
   <div class="container">
+    <h1 style="text-align: center; margin-bottom: 2rem;">Scraped properties</h1>
     <div style="display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 25rem));">
       {{#each properties}}
       <a href="{{ this.url }}" target="_blank" class="col">
@@ -27,15 +28,19 @@
       </a>
       {{/each}}
     </div>
-    {{!-- <nav class="d-flex justify-content-center" style="margin: 3rem 0 5rem 0;">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
-    </nav> --}}
+    <div style="margin: 3rem 0 5rem 0;">
+      <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+          {{#if showPreviousOffset}}
+          <li class="page-item"><a class="page-link" href="?offset={{ previousOffset }}">Previous properties</a></li>
+          {{/if }}
+          {{#if showNextOffset}}
+          <li class="page-item"><a class="page-link" href="/?offset={{ nextOffset }}">Next properties</a></li>
+          {{/if }}
+        </ul>
+      </nav>
+      <p style="text-align: center;">{{ offsetInfo }}</p>
+    </div>
   </div>
 </body>
 
