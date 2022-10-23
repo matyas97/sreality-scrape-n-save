@@ -1,8 +1,10 @@
 version: '3.4'
 
 services:
-  srealityscrapensave:
+  app:
     image: srealityscrapensave
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -13,3 +15,10 @@ services:
     command: npm run start
     ports:
       - 3001:3001
+  db:
+    image: postgres:14
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
