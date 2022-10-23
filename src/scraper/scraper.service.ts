@@ -22,7 +22,7 @@ export class ScraperService implements OnApplicationBootstrap {
 
     const startingUrl = 'https://www.sreality.cz/hledani/prodej/byty';
 
-    const pagesToScrape = 1;
+    const pagesToScrape = 25;
 
     const scrapedProperties: ScrapedProperty[] = [];
 
