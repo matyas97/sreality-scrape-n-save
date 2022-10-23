@@ -1,8 +1,4 @@
-###################
-# BUILD
-###################
-
-FROM node:16-alpine As build
+FROM node:16-alpine
 
 # manually installing chrome
 RUN apk add chromium

@@ -10,15 +10,15 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - .:/usr/src/app
-    env_file:
-      - .env
     command: npm run start
     ports:
       - 3001:3001
   db:
     image: postgres:14
     restart: always
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dev
     ports:
       - 5432:5432
