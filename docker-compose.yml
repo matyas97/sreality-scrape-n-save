@@ -10,7 +10,7 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - .:/usr/src/app
-    command: npm run start
+    command: node dist/main.js
     ports:
       - 3001:3001
   db:
