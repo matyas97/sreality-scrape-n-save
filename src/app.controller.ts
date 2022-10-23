@@ -1,5 +1,6 @@
-import { Controller, Get, Render } from '@nestjs/common';
+import { Controller, Get, Query, Render } from '@nestjs/common';
 import { AppService } from './app.service';
+import { PaginationParams } from './dto/pagination-params';
 
 @Controller()
 export class AppController {
@@ -7,7 +8,7 @@ export class AppController {
 
   @Get()
   @Render('index')
-  getProperties() {
-    return this.appService.getProperties();
+  getProperties(@Query() { offset }: PaginationParams) {
+    return this.appService.getProperties(offset);
   }
 }

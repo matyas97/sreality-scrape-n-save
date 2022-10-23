@@ -24,9 +24,12 @@ export class PropertyService {
     }
   }
 
-  listProperties() {
+  listProperties(offset?: number, limit?: number) {
     try {
-      return this.propertyRepository.find();
+      return this.propertyRepository.findAndCount({
+        skip: offset,
+        take: limit,
+      });
     } catch (error) {
       Logger.log(error, PropertyService.name);
       throw new ServiceUnavailableException();
