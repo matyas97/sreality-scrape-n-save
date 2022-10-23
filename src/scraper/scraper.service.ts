@@ -16,8 +16,9 @@ export class ScraperService implements OnModuleInit {
     Logger.log('Starting with scrape...', ScraperService.name);
 
     const browser = await puppeteer.launch({
-      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
+
     const page = await browser.newPage();
 
     const startingUrl = this.configService.get<string>('SREALITY_URL');
